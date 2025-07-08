@@ -391,3 +391,23 @@ def draw_from_pile(request, key, pile, location=""):
     response = HttpResponse(json.dumps(resp), content_type="application/json")
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+def list_all_piles(request, key):
+    try:
+        deck = Deck.objects.get(key=key)
+    except Deck.DoesNotExist:
+        return deck_id_does_not_exist()
+
+    piles = {}
+
+    for k in deck.piles:  # iterate through all the piles and list cards for every pile.
+        r = len(deck.piles[k])
+        a = []
+        for card in deck.piles[k]:
+            a.append(card_to_dict(card))
+        piles[k] = {"remaining": r, "cards": a}
+
+    resp = {'success': True, 'deck_id': deck.key, 'remaining': len(deck.stack), 'piles': piles}
+    response = HttpResponse(json.dumps(resp), content_type="application/json")
+    response['Access-Control-Allow-Origin'] = '*'
+    return response

@@ -23,5 +23,7 @@ urlpatterns = [
     path('deck/<slug:key>/pile/<slug:pile>/shuffle/', views.shuffle_pile, name='shuffle_pile'),
     path('deck/<slug:key>/pile/<slug:pile>/draw/', views.draw_from_pile, name='draw_pile'),
     path('deck/<slug:key>/pile/<slug:pile>/draw/<slug:location>/', views.draw_from_pile, name='draw_pile'),
-    path('deck/<slug:key>/pile/<slug:pile>/return/', views.return_pile_to_deck, name='return'),   
+    path('deck/<slug:key>/pile/<slug:pile>/return/', views.return_pile_to_deck, name='return'),
+    path('deck/<slug:key>/pile/list/', views.list_all_piles, name='list_all_piles'),
+
 ]
