@@ -26,10 +26,10 @@ class DeckTest(TestCase):
         resp = json.loads(response.content.decode('utf-8'))
         self.assertEqual(resp['success'], True)
         ace = resp['cards'][0]
-        self.assertEqual(ace['suit'], 'SPADES')
+        self.assertEqual(ace['suit'], 'WANDS')
         self.assertEqual(ace['value'], 'ACE')
-        self.assertEqual(ace['code'], 'AS')
-        self.assertEqual(resp['remaining'], 51)
+        self.assertEqual(ace['code'], 'AW')
+        self.assertEqual(resp['remaining'], 77)
 
         request = self.request_factory.get("/", {})
         response = shuffle(request, deck_id)
@@ -37,14 +37,14 @@ class DeckTest(TestCase):
         resp = json.loads(response.content.decode('utf-8'))
         self.assertEqual(resp['success'], True)
         self.assertEqual(resp['shuffled'], True)
-        self.assertEqual(resp['remaining'], 52)
+        self.assertEqual(resp['remaining'], 78)
 
         request = self.request_factory.get("/", {"count": 10})
         response = draw(request, deck_id)
         self.assertEqual(response.status_code, 200)
         resp = json.loads(response.content.decode('utf-8'))
         self.assertEqual(resp['success'], True)
-        self.assertEqual(resp['remaining'], 42)
+        self.assertEqual(resp['remaining'], 68)
         self.assertEqual(len(resp['cards']), 10)
         cards = resp['cards']
 
@@ -56,7 +56,7 @@ class DeckTest(TestCase):
         self.assertEqual(response.status_code, 200)
         resp = json.loads(response.content.decode('utf-8'))
         self.assertEqual(resp['success'], True)
-        self.assertEqual(resp['remaining'], 42)
+        self.assertEqual(resp['remaining'], 68)
         piles = resp['piles']
         self.assertEqual(piles['chase']['remaining'], 2)
         
@@ -83,7 +83,7 @@ class DeckTest(TestCase):
 
     def test_partial_deck(self):
         # test to make sure a new partial deck is returned when requested
-        request = self.request_factory.get("/", {'cards': 'AC,AD,AH,AS'})
+        request = self.request_factory.get("/", {'cards': 'AW,AC,AS,AP'})
         response = shuffle(request)
         self.assertEqual(response.status_code, 200)
         resp = json.loads(response.content.decode('utf-8'))
@@ -100,13 +100,13 @@ class DeckTest(TestCase):
         self.assertEqual(resp['success'], True)
         one, two, three, four = False, False, False, False
         for card in resp['cards']:
-            if card['code'] == 'AS':
+            if card['code'] == 'AW':
                 one = True
-            elif card['code'] == 'AD':
-                two = True
-            elif card['code'] == 'AH':
-                three = True
             elif card['code'] == 'AC':
+                two = True
+            elif card['code'] == 'AS':
+                three = True
+            elif card['code'] == 'AP':
                 four = True
         self.assertEqual(resp['remaining'], 0)
         self.assertEqual(one, True)
@@ -115,7 +115,7 @@ class DeckTest(TestCase):
         self.assertEqual(four, True)
 
         # verify that reshuffling a partial deck returns a partial deck
-        request = self.request_factory.get("/", {'cards': 'KC,KD,KH,KS'})
+        request = self.request_factory.get("/", {'cards': 'KW,KC,KS,KP'})
         response = shuffle(request)
         resp = json.loads(response.content.decode('utf-8'))
         deck_id = resp['deck_id']
@@ -130,4 +130,4 @@ class DeckTest(TestCase):
         self.assertEqual(response.status_code, 200)
         resp = json.loads(response.content.decode('utf-8'))
         self.assertEqual(resp['success'], True)
-        self.assertEqual(resp['remaining'], 47)
+        self.assertEqual(resp['remaining'], 73)

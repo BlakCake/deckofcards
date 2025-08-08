@@ -20,14 +20,58 @@ class User(AbstractUser):
         return self.email
 
 
-CARDS = ['AS', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '0S', 'JS', 'QS', 'KS',
-         'AD', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '0D', 'JD', 'QD', 'KD',
-         'AC', '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '0C', 'JC', 'QC', 'KC',
-         'AH', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '0H', 'JH', 'QH', 'KH']
-JOKERS = ['X1', 'X2']
+MINOR_VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'P', 'N', 'Q', 'K']
+MAJOR_ARCANA_VALUES = {
+    '0': 'THE FOOL',
+    '1': 'THE MAGICIAN',
+    '2': 'THE HIGH PRIESTESS',
+    '3': 'THE EMPRESS',
+    '4': 'THE EMPEROR',
+    '5': 'THE HIEROPHANT',
+    '6': 'THE LOVERS',
+    '7': 'THE CHARIOT',
+    '8': 'STRENGTH',
+    '9': 'THE HERMIT',
+    'A': 'WHEEL OF FORTUNE',
+    'B': 'JUSTICE',
+    'C': 'THE HANGED MAN',
+    'D': 'DEATH',
+    'E': 'TEMPERANCE',
+    'F': 'THE DEVIL',
+    'G': 'THE TOWER',
+    'H': 'THE STAR',
+    'I': 'THE MOON',
+    'J': 'THE SUN',
+    'K': 'JUDGEMENT',
+    'L': 'THE WORLD'
+}
 
-SUITS = {'S': 'SPADES', 'D': 'DIAMONDS', 'H': 'HEARTS', 'C': 'CLUBS', '1': 'BLACK', '2': 'RED'}
-VALUES = {'A': 'ACE', 'J': 'JACK', 'Q': 'QUEEN', 'K': 'KING', '0': '10', 'X': 'JOKER'}
+CARDS = [v + s for s in ['W', 'C', 'S', 'P'] for v in MINOR_VALUES] + [k + 'M' for k in MAJOR_ARCANA_VALUES.keys()]
+JOKERS = []
+
+SUITS = {
+    'W': 'WANDS',
+    'C': 'CUPS',
+    'S': 'SWORDS',
+    'P': 'PENTACLES',
+    'M': 'MAJOR'
+}
+VALUES = {
+    'A': 'ACE',
+    '2': '2',
+    '3': '3',
+    '4': '4',
+    '5': '5',
+    '6': '6',
+    '7': '7',
+    '8': '8',
+    '9': '9',
+    '0': '10',
+    'P': 'PAGE',
+    'N': 'KNIGHT',
+    'Q': 'QUEEN',
+    'K': 'KING'
+}
 
 class Deck(models.Model):
     key = models.CharField(default=random_string, max_length=15, db_index=True)
@@ -78,11 +122,10 @@ def card_to_dict(card):
         }
     }
 
-    if code == 'AD':
-        card_dict['image'] = 'https://deckofcardsapi.com/static/img/aceDiamonds.png'
-        card_dict['images']['png'] = 'https://deckofcardsapi.com/static/img/aceDiamonds.png'
-        card_dict['images']['svg'] = 'https://deckofcardsapi.com/static/img/aceDiamonds.svg'
-
-    card_dict['value'] = VALUES.get(value) or value
-    card_dict['suit'] = SUITS.get(suit) or suit
+    if suit == 'M':
+        card_dict['value'] = MAJOR_ARCANA_VALUES.get(value, value)
+        card_dict['suit'] = SUITS.get(suit, suit)
+    else:
+        card_dict['value'] = VALUES.get(value) or value
+        card_dict['suit'] = SUITS.get(suit) or suit
     return card_dict
